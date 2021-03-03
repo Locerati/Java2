@@ -10,13 +10,18 @@ public class Calculation {
     public Calculation(String expr){
         expresion='('+expr+')';
         priority.put('(',-1);
-        priority.put('*',1);
-        priority.put('/',1);
-        priority.put('+',2);
-        priority.put('-',2);
+        priority.put('^',1);
+        priority.put('*',2);
+        priority.put('/',2);
+        priority.put('+',3);
+        priority.put('-',3);
+
 
     }
-    public  double Calc() throws Exception{
+    public void changeExpresion(String expr){
+        expresion='('+expr+')';
+    }
+    public  double calc() throws Exception{
 
         Wrapper<Integer> stance=new Wrapper<Integer>(0);
         Object curr;
@@ -33,7 +38,12 @@ public class Calculation {
                 {
                     if((char)curr!=')'){
                         while (mayPop((char) curr)){
+                            if (numbers.size()>=2){
                             popFunction();
+                            }
+                            else {
+                                throw new Exception("Неправильно введенное выражение");
+                            }
                         }
                         signs.push((char)curr);
                     }
@@ -72,6 +82,9 @@ public class Calculation {
             case '/':
                 numbers.push(firstNumber/secondNumber);
                 break;
+            case '^':
+                numbers.push(Math.pow(firstNumber,secondNumber));
+                break;
         }
     }
     private boolean mayPop(char op) throws Exception{
@@ -97,7 +110,7 @@ public class Calculation {
         throw new Exception("Недопустимый знак");
     }
     private Object getCurrent(Wrapper<Integer> stance){
-        if (expresion.charAt(stance.get())==' ' && stance.get()<expresion.length()){
+        while (expresion.charAt(stance.get())==' ' && stance.get()<expresion.length()){
             addOne(stance);
 
         }
