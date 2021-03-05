@@ -7,6 +7,8 @@ public class Calculation {
     private Stack<Double> numbers =new Stack<Double>();
     private Stack<Character> signs=new Stack<Character>();
     private Map<Character, Integer> priority = new HashMap<Character, Integer>();
+    private Map<Character, Double> variables = new HashMap<Character, Double>();
+    private IReadVariables readVariables;
     public Calculation(String expr){
         expresion='('+expr+')';
         priority.put('(',-1);
@@ -21,6 +23,13 @@ public class Calculation {
     public void changeExpresion(String expr){
         expresion='('+expr+')';
     }
+    public  double calcWithVariables(IReadVariables readVrbl) throws Exception{
+        readVariables=readVrbl;
+        double result=calc();
+        readVariables=null;
+        return result;
+    }
+
     public  double calc() throws Exception{
 
         Wrapper<Integer> stance=new Wrapper<Integer>(0);
@@ -109,7 +118,7 @@ public class Calculation {
         }
         throw new Exception("Недопустимый знак");
     }
-    private Object getCurrent(Wrapper<Integer> stance){
+    private Object getCurrent(Wrapper<Integer> stance) throws Exception{
         while (expresion.charAt(stance.get())==' ' && stance.get()<expresion.length()){
             addOne(stance);
 
@@ -127,12 +136,33 @@ public class Calculation {
             return Double.parseDouble(result);
         }
         else
+            if(readVariables!=null && Character.isLetter(expresion.charAt(stance.get()))){
+                if (stance.get()<expresion.length()&&Character.isLetter(expresion.charAt(stance.get()+1)))
+                    throw new Exception("Неподдерживаемые имена переменных");
+                return variableToDouble(stance);
+
+        }
+        else
         {
             addOne(stance);
             return expresion.charAt(stance.get()-1);
         }
 
 
+    }
+    private double variableToDouble(Wrapper<Integer> stance){
+        Character letter =expresion.charAt(stance.get());
+        for(Map.Entry<Character,  Double> item:variables.entrySet()){
+            if (item.getKey()==letter){
+                double res= item.getValue();
+                addOne(stance);
+                return res;
+            }
+        }
+        double value = readVariables.read("Enter variable - "+letter+':');
+        addOne(stance);
+        variables.put(letter,value);
+        return value;
     }
     private static void addOne( Wrapper<Integer> ref ) {
         int i = ref.get();

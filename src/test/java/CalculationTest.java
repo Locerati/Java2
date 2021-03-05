@@ -86,5 +86,25 @@ class CalculationTest {
         catch (Exception ex){
             assertEquals("Неправильно введенное выражение", ex.getMessage());
         }
+        sc.changeExpresion("5+)5-8+2");
+        try{
+            sc.calc();
+        }
+        catch (Exception ex){
+            assertEquals("Неправильно введенное выражение", ex.getMessage());
+        }
+
+    }
+    @org.junit.jupiter.api.Test
+    void calcWithVariables() {
+        Calculation sc=new Calculation("a*b+c+b+k");
+        try{
+            ReadVariables read=new ReadVariables();
+            assertEquals( 24, sc.calcWithVariables(read),0.01);
+
+        }catch (Exception ex){
+            assertEquals("", ex.getMessage());
+        }
+
     }
 }
