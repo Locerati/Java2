@@ -1,3 +1,8 @@
+/**
+ * Класс обертка
+ * @author Denis Popov
+ * @version 1.0
+ */
 public class Wrapper<E> {
         E ref;
         public Wrapper(E e ){
